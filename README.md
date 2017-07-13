@@ -1,7 +1,11 @@
 # dlog
 aliyun simple log(带缓存写出) &amp;&amp; os.stdout写入
 
-# Usage
+## Usage
+
+```shell
+go get github.com/cnjack/dlog
+```
 
 ```go
 package main
@@ -10,21 +14,17 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/cnjack/dlog"
 	"time"
+	"context"
 )
-
-var writer *dlog.Writer
 
 func main(){
 	var log = logrus.New()
-
-
-	var err error
-	writer,err = dlog.NewWriter("xxxxxx.cn-hangzhou.log.aliyuncs.com", "xxxxxxxxxxxx", "xxxxxxxxxxxxxxxxxxxxx","xxxxxx", "xxxxxx")
+	ctx, done := context.WithCancel(context.Background())
+	writer,err := dlog.NewWriter("xxxxxx.cn-hangzhou.log.aliyuncs.com", "xxxxxxxxxxxx", "xxxxxxxxxxxxxxxxxxxxx","xxxxxx", "xxxxxx", ctx)
 	if err != nil {
 		panic(err)
 	}
-	// Output to stdout instead of the default stderr
-	// Can be any io.Writer, see below for File example
+
 	log.Out = writer
 	log.Formatter = &logrus.JSONFormatter{}
 
@@ -32,7 +32,8 @@ func main(){
 		"animal": "walrus",
 		"size":   10,
 	}).Info("A group of walrus emerges from the ocean")
-	writer.DoWrite()
-	time.Sleep(time.Second*10)
+	//make sure write
+	done()
+	time.Sleep(time.Second*5)
 }
 ```

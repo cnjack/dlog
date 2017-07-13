@@ -4,12 +4,13 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/cnjack/dlog"
 	"time"
+	"context"
 )
 
 func main(){
 	var log = logrus.New()
-
-	writer,err := dlog.NewWriter("xxxxxx.cn-hangzhou.log.aliyuncs.com", "xxxxxxxxxxxx", "xxxxxxxxxxxxxxxxxxxxx","xxxxxx", "xxxxxx")
+	ctx, done := context.WithCancel(context.Background())
+	writer,err := dlog.NewWriter("xxxxxx.cn-hangzhou.log.aliyuncs.com", "xxxxxxxxxxxx", "xxxxxxxxxxxxxxxxxxxxx","xxxxxx", "xxxxxx", ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -22,6 +23,6 @@ func main(){
 		"size":   10,
 	}).Info("A group of walrus emerges from the ocean")
 	//make sure write
-	writer.DoWrite()
-	time.Sleep(time.Second*10)
+	done()
+	time.Sleep(time.Second*5)
 }
